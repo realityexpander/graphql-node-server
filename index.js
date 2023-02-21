@@ -32,9 +32,13 @@ const typeDefs = gql`
     # languages: [Language],
     language(code: ID!): Language,
     country(code: ID!): Country,
-    # continent(code: ID!): Continent
+    continent(code: ID!): Continent
   }
 `;
+
+let getContinent = (code) => data.continents.find( continent => 
+    continent.code === code
+  )
 
 // Provide resolver functions for your schema fields
 const resolvers = {
@@ -48,56 +52,76 @@ const resolvers = {
     countries: () => data.countries,
     // languages: () => data.languages,
     language: (parent, args, context, info) => {
-      console.log("Query language  DB: ", args)
-      return data.languages.find(language => language.code === args["code"])
+      console.log("Query DB language: ", args)
+      let res = data.languages.find(language => language.code === args["code"])
+      console.log("Query DB language res: ", res)
+      return res
     },
     country: (parent, args, context, info) => {
-      console.log("Query country DB: ", args)
-      return data.countries.find(country => country.code === args["code"])
+      console.log("Query DB country: ", args)
+      let res = data.countries.find(country => country.code === args["code"])
+      console.log("Query DB country res: ", res)
+      return res
     },
-    // continent: (parent, args, context, info) => {
-    //   console.log(args)
-    //   return data.continents.find(continent => continent.code === args["code"])
-    // }
+    continent: (parent, args, context, info) => {
+      console.log("Query DB continent: ", args)
+      // let res = data.continents.find(continent => continent.code === args["code"])
+      let res = getContinent(args["code"])
+      console.log("Query DB continent res: ", res)
+      return res
+    }
   },
   Country: {
+    // continent: (parent, args, context, info) => {
+    //   console.log("Country DB continent2:", info.variableValues)
+    //   let res = getContinent(parent.continent.code)
+    //   console.log("Country DB continent2 res:", res)
+    //   return res
+    // },
     continent: (parent, args, context, info) => {
-      console.log("Country continent DB:", parent)
-      return data.continents.find( continent => 
-        continent.code === parent.continent.code
-      )
+      console.log("Country DB continent:", parent.continent.code)
+      // let res = data.continents.find( continent => 
+      //   continent.code === parent.continent.code
+      // )
+      let res = getContinent(parent.continent.code)
+      console.log("Country DB continent res:", res)
+      return res
     },
     languages: (parent, args, context, info) => {
-      console.log("Country languages DB:", parent)
-      return data.languages.filter( language => 
+      console.log("Country DB languages:", parent.languages)
+      let res = data.languages.filter( language => 
         parent.languages.find( countryLanguage => 
           countryLanguage.code === language.code
         )
       )
+      console.log("Country DB languages res:", res)
+      return res
     }
   },
   Language: {
     name: (parent, args, context, info) => {
-      console.log("Language lookup name:", parent)
+      console.log("Language lookup name:", parent.name)
       return parent.name
     },
     native: (parent, args, context, info) => {
-      console.log("Language lookup native:", parent)
+      console.log("Language lookup native:", parent.native)
       return parent.native
     },
     rtl: (parent, args, context, info) => {
-      console.log("Language lookup rtl:", parent)
+      console.log("Language lookup rtl:", parent.rtl)
       return parent.rtl
     }
   },
   Continent: {
     name: (parent, args, context, info) => {
-      console.log("Continent lookup name:", parent)
+      console.log("Continent lookup name:", parent.name)
       return parent.name
     },
     countries: (parent, args, context, info) => {
-      console.log("Continent countries DB:", parent)
-      return data.countries.filter(country => country.continent.code === parent.code)
+      console.log("Continent DB countries:", parent.code, parent.countries)
+      let res = data.countries.filter(country => country.continent.code === parent.code)
+      console.log("Continent DB countries res:", res)
+      return res
     }
   }
 };
@@ -105,13 +129,13 @@ const resolvers = {
 // console.log("data.language= " + data.languages)
 
 const server = new ApolloServer({ typeDefs, resolvers });
-
 const app = express();
+
 server.start()
-.then(() => {
-  console.log("Server started")
-  server.applyMiddleware({ app });
-});
+  .then(() => {
+    console.log("Server started")
+    server.applyMiddleware({ app });
+  });
 
 app.listen({ port: 4000 }, () =>
   console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`)

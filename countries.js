@@ -148,7 +148,7 @@ const continents = [
   {
     code: "AN",
     name: "Antarctica",
-    countries: []
+    countries: null
   },
   {
     code: "AS",
