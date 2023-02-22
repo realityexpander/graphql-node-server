@@ -1,3 +1,8 @@
+
+// Articles
+// https://www.apollographql.com/blog/backend/using-express-with-graphql-server-node-js/
+// 
+
 const express = require('express');
 const { ApolloServer, gql } = require('apollo-server-express');
 const data = require('./countries.js');
@@ -81,13 +86,13 @@ const resolvers = {
   },
   Country: {
     continent: (parent, args, context, info) => {
-      console.log("Country DB continent:", parent.continent.code)
+      console.log("Country DB continent:", parent.code, parent.continent.code)
       let res = getContinent(parent.continent.code)
       console.log("Country DB continent res:", res)
       return res
     },
     languages: (parent, args, context, info) => {
-      console.log("Country DB languages:", parent.languages) 
+      console.log("Country DB languages:", parent.code, parent.languages) 
       let res = parent.languages.map( countryLanguage =>
         getLanguage(countryLanguage.code)
       )
@@ -97,21 +102,21 @@ const resolvers = {
   },
   Language: {
     name: (parent, args, context, info) => {
-      console.log("Language lookup name:", parent.name)
+      console.log("Language lookup name:", parent.code, parent.name)
       return parent.name
     },
     native: (parent, args, context, info) => {
-      console.log("Language lookup native:", parent.native)
+      console.log("Language lookup native:", parent.code, parent.native)
       return parent.native
     },
     rtl: (parent, args, context, info) => {
-      console.log("Language lookup rtl:", parent.rtl)
+      console.log("Language lookup rtl:", parent.code, parent.rtl)
       return parent.rtl
     }
   },
   Continent: {
     name: (parent, args, context, info) => {
-      console.log("Continent lookup name:", parent.name)
+      console.log("Continent lookup name:", parent.code, parent.name)
       return parent.name
     },
     countries: (parent, args, context, info) => {
