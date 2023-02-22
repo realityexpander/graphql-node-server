@@ -9,7 +9,18 @@ const data = require('./countries.js');
 
 // Construct a schema, using GraphQL schema language
 const typeDefs = gql`
-  type Country {
+  enum CacheControlScope {
+    PUBLIC
+    PRIVATE
+  }
+
+  directive @cacheControl(
+    maxAge: Int
+    scope: CacheControlScope
+    inheritMaxAge: Boolean
+  ) on FIELD_DEFINITION | OBJECT | INTERFACE | UNION
+
+  type Country @cacheControl(maxAge: 50) {
     code: ID!
     name: String!
     continent: Continent!
